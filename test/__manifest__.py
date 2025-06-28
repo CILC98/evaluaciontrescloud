@@ -6,8 +6,21 @@
     'summary': 'Test Module',
     'website': 'trescloud.com',
     'depends': [
+        'account',
+        'sale',
+        'stock',
     ],
     'data': [
+        # security
+        'security/delivery_detail_security.xml',
+        'security/ir.model.access.csv',
+        # data
+        # views
+        'views/account_move_views.xml',
+        'views/delivery_detail_views.xml',
+        # reports
+        'reports/report_invoice_templates.xml',
+        # wizard
     ],
     'installable': True,
     'application': True,

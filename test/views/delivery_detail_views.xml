@@ -1,32 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="" model="ir.ui.view">
-        <field name="name"></field>
-        <field name="model">delivery.detail</field>
-
-        <field name="arch" type="xml">
-
-        </field>
-    </record>
-
-    <record id="" model="ir.ui.view">
-        <field name="name"></field>
+    <!-- Vista de Lista para Delivery Detail -->
+    <record id="delivery_detail_tree_view" model="ir.ui.view">
+        <field name="name">delivery.detail.tree</field>
         <field name="model">delivery.detail</field>
         <field name="arch" type="xml">
-
+            <tree>
+                <field name="picking_name" string="Transferencia"/>
+                <field name="invoiced" string="Facturado"/>
+            </tree>
         </field>
     </record>
 
-    <record id="" model="ir.actions.server">
-		<field name="name"></field>
-		<field name="state">code</field>
-		<field name="type">ir.actions.server</field>
-		<field name="model_id" ref=""/>
-		<field name="binding_model_id" ref=""/>
-		<field name="binding_view_types"></field>
-		<field name="code">
-
+    <!-- Vista de Formulario para Delivery Detail -->
+    <record id="delivery_detail_form_view" model="ir.ui.view">
+        <field name="name">delivery.detail.form</field>
+        <field name="model">delivery.detail</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="picking_id" string="Transferencia" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="invoiced" string="Facturado"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Líneas de Detalle">
+                            <field name="delivery_detail_line_ids" readonly="1">
+                                <tree>
+                                    <field name="qty" string="Cantidad"/>
+                                    <field name="uom_id" string="Unidad de medida"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
         </field>
     </record>
+
+    <!-- Acción para abrir la vista de delivery details -->
+    <record id="action_delivery_detail" model="ir.actions.act_window">
+        <field name="name">Detalles de Entrega</field>
+        <field name="res_model">delivery.detail</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay detalles de entrega configurados
+            </p>
+            <p>
+                Los detalles de entrega se crean automáticamente desde las facturas de cliente.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú en Contabilidad para Detalles de Entrega -->
+    <menuitem id="menu_delivery_detail_accounting"
+              name="Detalles de Entrega"
+              parent="account.menu_finance_configuration"
+              action="action_delivery_detail"
+              sequence="85"
+              groups="test.group_delivery_detail_administrator"/>
+
+    <!-- Acción de Servidor para marcar como facturado masivamente -->
+    <record id="action_mark_delivery_details_invoiced" model="ir.actions.server">
+        <field name="name">Cambiar a Facturado</field>
+        <field name="state">code</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="test.model_delivery_detail"/>
+        <field name="binding_model_id" ref="test.model_delivery_detail"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('test.group_delivery_detail_administrator'))]"/>
+        <field name="code">
+        action = records.action_mass_mark_as_invoiced()
+        </field>
+    </record>
+
 </odoo>
